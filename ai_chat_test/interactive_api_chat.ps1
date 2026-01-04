@@ -52,8 +52,11 @@ while ($true) {
         $responseTask.Wait()
         $response = $responseTask.Result
 
+
         if (-not $response.IsSuccessStatusCode) {
-            Write-Error "API Error: $($response.StatusCode)"
+            Write-Error "API Error: $($response.StatusCode) - $($response.ReasonPhrase)"
+            $content = $response.Content.ReadAsStringAsync().Result
+            Write-Host "Response Body: $content" -ForegroundColor Red
             continue
         }
 

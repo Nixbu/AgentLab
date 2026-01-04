@@ -70,11 +70,13 @@ def chat():
                         except json.JSONDecodeError:
                             continue
                             
-            # 5. Update History with full assistant response
-            print("\n") # Newline after response
-            history.append({"role": "assistant", "content": full_response})
 
-        except Exception as e:
+
+        # 5. Update History
+        print("\n") # Newline after response
+        history.append({"role": "assistant", "content": full_response})
+
+    except Exception as e:
             print(f"\n[!] Error communicating with Ollama: {e}")
             print(f"[!] Ensure the Docker container is running and port 11434 is open.\n")
 
