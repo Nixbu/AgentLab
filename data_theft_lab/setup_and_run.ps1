@@ -7,6 +7,8 @@ $MODEL_NAME = "llama3"
 # Cleanup to ensure fresh network state
 Write-Host "[-] cleaning up previous containers..." -ForegroundColor Yellow
 docker-compose down --remove-orphans
+# Force remove containers by name to avoid conflicts with other labs
+docker rm -f mailhog ollama-server archive-server victim-agent 2>$null
 
 Write-Host "[-] Starting infrastructure (Ollama, Archive, Mailhog)..." -ForegroundColor Cyan
 # Force build to ensure file changes (like tomato.html) are picked up
@@ -51,7 +53,14 @@ docker-compose build victim-agent
 # Since it's a "one-shot" script, let's run it and follow logs.
 docker-compose up -d victim-agent
 
-Write-Host "[-] Agent is running. Following logs..." -ForegroundColor Cyan
+# 3. Seed the Victim's Inbox (Data Theft Setup)
+Write-Host "[-] Seeding Victim's Email Inbox with Private Data..." -ForegroundColor Cyan
+# We run this INSIDE the container so it can reach 'mailhog' by hostname
+docker exec victim-agent python seed_emails.py
+Start-Sleep -Seconds 2
+
+# 4. Agent Logs
+Write-Host "[-] Agent is running. Following logs..." -ForegroundColor Green
 Start-Sleep -Seconds 2
 docker logs -f victim-agent
 
